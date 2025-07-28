@@ -17,9 +17,11 @@
     <head>
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <title>Verify Account - Oiship</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet"/>
+        <title>Verify Account - Oishop Food</title>
+        <link rel="stylesheet" href="css/bootstrap.css" />
+        <script src="js/bootstrap.bundle.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <style>
             * {
                 margin: 0;
@@ -28,84 +30,120 @@
             }
 
             body {
-                background: linear-gradient(135deg, #fff4e6 0%, #ffe0b3 50%, #ffcc80 100%);
-                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #FFE4C4 0%, #FFA07A 25%, #FF8C69 50%, #FFB347 75%, #FFDAB9 100%);
+                background-size: 300% 300%;
+                animation: gradientFlow 12s ease infinite;
                 min-height: 100vh;
                 display: flex;
-                justify-content: center;
                 align-items: center;
+                justify-content: center;
+                flex-direction: column;
+                font-family: 'Poppins', sans-serif;
                 position: relative;
-                overflow-x: hidden;
+                overflow: hidden;
             }
 
-            /* Animated background particles */
-            .background-particles {
-                position: fixed;
+            /* Floating particles animation */
+            .particles {
+                position: absolute;
                 top: 0;
                 left: 0;
                 width: 100%;
                 height: 100%;
-                pointer-events: none;
+                overflow: hidden;
                 z-index: 1;
             }
 
             .particle {
                 position: absolute;
-                background: rgba(255, 152, 0, 0.1);
+                background: rgba(255, 255, 255, 0.1);
                 border-radius: 50%;
                 animation: float 6s ease-in-out infinite;
             }
 
-            .particle:nth-child(1) { width: 20px; height: 20px; top: 20%; left: 10%; animation-delay: 0s; }
-            .particle:nth-child(2) { width: 15px; height: 15px; top: 60%; left: 20%; animation-delay: 2s; }
-            .particle:nth-child(3) { width: 25px; height: 25px; top: 30%; left: 80%; animation-delay: 4s; }
-            .particle:nth-child(4) { width: 18px; height: 18px; top: 80%; left: 70%; animation-delay: 1s; }
-            .particle:nth-child(5) { width: 22px; height: 22px; top: 10%; left: 60%; animation-delay: 3s; }
+            .particle:nth-child(1) { width: 80px; height: 80px; left: 10%; animation-delay: 0s; }
+            .particle:nth-child(2) { width: 60px; height: 60px; left: 20%; animation-delay: 2s; }
+            .particle:nth-child(3) { width: 100px; height: 100px; left: 35%; animation-delay: 4s; }
+            .particle:nth-child(4) { width: 70px; height: 70px; left: 70%; animation-delay: 1s; }
+            .particle:nth-child(5) { width: 90px; height: 90px; left: 80%; animation-delay: 3s; }
+
+            /* Background logo text */
+            .bg-logo-text {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 8rem;
+                font-weight: 700;
+                color: rgba(255, 255, 255, 0.03);
+                user-select: none;
+                pointer-events: none;
+                z-index: 1;
+                animation: logoFloat 8s ease-in-out infinite;
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+            }
+
+            /* Gradient flow animation */
+            @keyframes gradientFlow {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
 
             @keyframes float {
-                0%, 100% { transform: translateY(0px) scale(1); }
-                50% { transform: translateY(-20px) scale(1.1); }
+                0%, 100% { transform: translateY(0px) rotate(0deg); }
+                33% { transform: translateY(-30px) rotate(120deg); }
+                66% { transform: translateY(30px) rotate(240deg); }
             }
 
+            @keyframes logoFloat {
+                0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.03; }
+                50% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.05; }
+            }
+
+            /* Logo */
             .logo {
                 position: absolute;
-                top: 20px;
+                top: 30px;
                 left: 30px;
-                height: 60px;
+                height: 50px;
+                animation: bounceIn 1s ease-out;
                 z-index: 10;
-                transition: transform 0.3s ease;
+                filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
             }
 
-            .logo:hover {
-                transform: scale(1.05);
-            }
-
-            .verify-container {
+            /* Main content */
+            h1, p, .verify-card {
                 position: relative;
                 z-index: 5;
-                animation: slideIn 0.8s ease-out;
             }
 
-            @keyframes slideIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(30px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
+            h1 {
+                margin-top: 40px;
+                color: #fff;
+                text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                animation: fadeInDown 1.2s ease-out;
+                font-weight: 600;
             }
 
+            p {
+                color: #fff;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                animation: fadeIn 1.4s ease-out;
+                font-weight: 400;
+            }
+
+            /* Verify card */
             .verify-card {
-                max-width: 450px;
-                width: 90%;
+                max-width: 500px;
+                width: 100%;
+                border-radius: 25px;
                 background: rgba(255, 255, 255, 0.95);
                 backdrop-filter: blur(10px);
-                border-radius: 20px;
-                box-shadow: 0 20px 40px rgba(255, 152, 0, 0.2);
-                padding: 40px;
-                border: 1px solid rgba(255, 152, 0, 0.1);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                animation: zoomIn 1s ease-out;
+                margin-top: 30px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
                 position: relative;
                 overflow: hidden;
             }
@@ -117,7 +155,7 @@
                 left: 0;
                 right: 0;
                 height: 4px;
-                background: linear-gradient(90deg, #ff9800, #ff5722, #ff9800);
+                background: linear-gradient(90deg, #FF8C69, #FF5722, #FF8C69);
                 background-size: 200% 100%;
                 animation: shimmer 2s linear infinite;
             }
@@ -127,6 +165,11 @@
                 100% { background-position: 200% 0; }
             }
 
+            .inner-card {
+                border-radius: 20px;
+                padding: 40px;
+            }
+
             .verify-header {
                 text-align: center;
                 margin-bottom: 30px;
@@ -134,7 +177,7 @@
 
             .verify-header h2 {
                 font-size: 1.8rem;
-                color: #e65100;
+                color: #FF8C69;
                 margin-bottom: 10px;
                 font-weight: 600;
             }
@@ -143,11 +186,12 @@
                 color: #666;
                 font-size: 0.95rem;
                 margin: 0;
+                text-shadow: none;
             }
 
             .header-icon {
                 font-size: 3rem;
-                color: #ff9800;
+                color: #FF8C69;
                 margin-bottom: 15px;
                 animation: pulse 2s ease-in-out infinite;
             }
@@ -157,21 +201,22 @@
                 50% { transform: scale(1.05); }
             }
 
+            /* Countdown */
             .countdown {
-                background: linear-gradient(135deg, #fff3e0, #ffe0b2);
-                color: #e65100;
+                background: linear-gradient(135deg, #FFF8E1, #FFECB3);
+                color: #FF8C69;
                 font-weight: 600;
                 padding: 15px;
                 border-radius: 12px;
                 text-align: center;
                 margin-bottom: 20px;
-                border: 2px solid #ffcc80;
+                border: 2px solid #FFD180;
                 font-size: 1.1rem;
                 position: relative;
             }
 
             .countdown.expired {
-                background: linear-gradient(135deg, #ffebee, #ffcdd2);
+                background: linear-gradient(135deg, #FFEBEE, #FFCDD2);
                 color: #d32f2f;
                 border-color: #ef9a9a;
                 animation: shake 0.5s ease-in-out;
@@ -183,30 +228,9 @@
                 75% { transform: translateX(5px); }
             }
 
-            .error-message {
-                background: linear-gradient(135deg, #ffebee, #ffcdd2);
-                color: #c62828;
-                padding: 15px;
-                border-radius: 10px;
-                margin-bottom: 20px;
-                border-left: 4px solid #f44336;
-                font-size: 0.9rem;
-                animation: slideInLeft 0.5s ease-out;
-            }
-
-            @keyframes slideInLeft {
-                from {
-                    opacity: 0;
-                    transform: translateX(-20px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateX(0);
-                }
-            }
-
+            /* Form control */
             .form-control {
-                border: 2px solid #ffcc80;
+                border: 2px solid #FFE4C4;
                 border-radius: 12px;
                 padding: 15px;
                 font-size: 1.2rem;
@@ -219,17 +243,19 @@
             }
 
             .form-control:focus {
-                border-color: #ff9800;
-                box-shadow: 0 0 0 0.2rem rgba(255, 152, 0, 0.25);
-                background: white;
-                transform: scale(1.02);
+                border-color: #FF8C69;
+                box-shadow: 0 0 0 0.2rem rgba(255, 140, 105, 0.25);
+                background: #fff;
+                transform: translateY(-2px);
             }
 
             .form-control:disabled {
                 background: #f5f5f5;
                 color: #999;
+                border-color: #ddd;
             }
 
+            /* Buttons */
             .btn {
                 padding: 15px 25px;
                 border-radius: 12px;
@@ -244,33 +270,30 @@
             .btn::before {
                 content: '';
                 position: absolute;
-                top: 50%;
-                left: 50%;
-                width: 0;
-                height: 0;
-                background: rgba(255, 255, 255, 0.2);
-                border-radius: 50%;
-                transform: translate(-50%, -50%);
-                transition: width 0.6s, height 0.6s;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                transition: left 0.5s;
             }
 
             .btn:hover::before {
-                width: 300px;
-                height: 300px;
+                left: 100%;
             }
 
             .btn-verify {
                 width: 100%;
-                background: linear-gradient(135deg, #ff9800, #ff5722);
+                background: linear-gradient(135deg, #FF8C69, #FFA07A);
                 color: white;
                 margin-bottom: 15px;
-                box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+                box-shadow: 0 4px 15px rgba(255, 140, 105, 0.3);
             }
 
             .btn-verify:hover {
-                background: linear-gradient(135deg, #f57c00, #e64a19);
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
+                background: linear-gradient(135deg, #FF7F50, #FF8C69);
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(255, 140, 105, 0.4);
             }
 
             .btn-verify:disabled {
@@ -290,30 +313,80 @@
 
             .btn-resend:hover {
                 background: linear-gradient(135deg, #1976d2, #1565c0);
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(33, 150, 243, 0.4);
             }
 
             .btn-back {
                 width: 100%;
-                background: linear-gradient(135deg, #757575, #616161);
+                background: linear-gradient(135deg, #FFB347, #FFA07A);
                 color: white;
-                box-shadow: 0 4px 15px rgba(117, 117, 117, 0.3);
+                box-shadow: 0 4px 15px rgba(255, 179, 71, 0.3);
             }
 
             .btn-back:hover {
-                background: linear-gradient(135deg, #616161, #424242);
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(117, 117, 117, 0.4);
+                background: linear-gradient(135deg, #FF9500, #FFB347);
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(255, 179, 71, 0.4);
             }
 
+            /* Error message */
+            .error-message {
+                background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+                color: #fff;
+                padding: 15px;
+                border-radius: 12px;
+                margin-bottom: 20px;
+                font-size: 0.9rem;
+                animation: slideInLeft 0.5s ease-out;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            @keyframes slideInLeft {
+                from {
+                    opacity: 0;
+                    transform: translateX(-20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            /* Success message */
+            .alert-success {
+                background: linear-gradient(135deg, #4ECDC4, #44A08D);
+                color: #fff;
+                border: none;
+                border-radius: 12px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            /* Divider */
             .divider {
+                position: relative;
                 text-align: center;
                 margin: 20px 0;
-                color: #999;
-                font-size: 0.9rem;
             }
 
+            .divider::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, #FFB347, transparent);
+            }
+
+            .divider span {
+                background: #fff;
+                padding: 0 20px;
+                color: #FF8C69;
+                font-weight: 500;
+            }
+
+            /* Loading spinner */
             .loading-spinner {
                 display: none;
                 width: 20px;
@@ -353,23 +426,74 @@
                 transform: translate(-50%, -60%) rotate(-45deg);
             }
 
-            @media (max-width: 576px) {
+            /* Animations */
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+
+            @keyframes fadeInDown {
+                from { opacity: 0; transform: translateY(-30px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+
+            @keyframes zoomIn {
+                from { opacity: 0; transform: scale(0.8); }
+                to { opacity: 1; transform: scale(1); }
+            }
+
+            @keyframes bounceIn {
+                0% { opacity: 0; transform: scale(0.3); }
+                50% { opacity: 1; transform: scale(1.05); }
+                70% { transform: scale(0.9); }
+                100% { transform: scale(1); }
+            }
+
+            @keyframes slideInUp {
+                from { opacity: 0; transform: translateY(30px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .bg-logo-text {
+                    font-size: 4rem;
+                }
+                
                 .verify-card {
-                    padding: 30px 25px;
                     margin: 20px;
                 }
                 
+                .inner-card {
+                    padding: 30px 20px;
+                }
+                
                 .logo {
-                    height: 50px;
-                    top: 15px;
+                    top: 20px;
                     left: 20px;
+                    height: 40px;
+                }
+                
+                h1 {
+                    font-size: 2rem;
+                    margin-top: 30px;
+                }
+            }
+
+            @media (max-width: 576px) {
+                .bg-logo-text {
+                    font-size: 3rem;
+                }
+                
+                .inner-card {
+                    padding: 20px 15px;
                 }
             }
         </style>
     </head>
     <body>
-        <!-- Background particles -->
-        <div class="background-particles">
+        <!-- Floating particles -->
+        <div class="particles">
             <div class="particle"></div>
             <div class="particle"></div>
             <div class="particle"></div>
@@ -377,14 +501,22 @@
             <div class="particle"></div>
         </div>
 
-        <a href="/OishipFoodOrdering"><img src="images/logov2.png" alt="Oiship Logo" class="logo"/></a>
+        <!-- Background logo text -->
+        <div class="bg-logo-text">OISHOP FOOD</div>
 
-        <div class="verify-container">
-            <div class="verify-card">
+        <a href="/OishipFoodOrdering">
+            <img src="images/logov2.png" alt="Oishop Logo" class="logo" />
+        </a>
+
+        <h1 class="display-4 fw-bold">Email Verification</h1>
+        <p class="mt-3 fs-5">We've sent a 6-digit code to your email address</p>
+
+        <div class="verify-card">
+            <div class="inner-card">
                 <div class="verify-header">
                     <i class="bi bi-shield-check header-icon"></i>
-                    <h2>Email Verification</h2>
-                    <p>We've sent a 6-digit code to your email address</p>
+                    <h2>Verify Your Account</h2>
+                    <p>Enter the verification code sent to your email</p>
                 </div>
 
                 <% if (request.getAttribute("error") != null) {%>
@@ -414,7 +546,7 @@
                     </button>
 
                     <div class="divider">
-                        <i class="bi bi-three-dots"></i>
+                        <span><i class="bi bi-three-dots"></i></span>
                     </div>
 
                     <a href="/OishipFoodOrdering/register" class="btn btn-back">
@@ -474,7 +606,7 @@
                 if (value.length === 6) {
                     e.target.style.borderColor = '#4caf50';
                 } else {
-                    e.target.style.borderColor = '#ffcc80';
+                    e.target.style.borderColor = '#FFE4C4';
                 }
             });
 
@@ -502,7 +634,7 @@
                         successMsg.className = 'alert alert-success';
                         successMsg.innerHTML = '<i class="bi bi-check-circle me-2"></i>New verification code sent successfully!';
                         successMsg.style.animation = 'slideInLeft 0.5s ease-out';
-                        document.querySelector('.verify-card').insertBefore(successMsg, document.querySelector('form'));
+                        document.querySelector('.inner-card').insertBefore(successMsg, document.querySelector('form'));
                         
                         setTimeout(() => successMsg.remove(), 3000);
 
@@ -524,23 +656,39 @@
                         clearInterval(timer);
                         timer = setInterval(updateCountdown, 1000);
                     } else {
-                        alert("Error: " + (data.error || data.message || "Unknown error"));
+                        // Show error message
+                        const errorMsg = document.createElement('div');
+                        errorMsg.className = 'error-message';
+                        errorMsg.innerHTML = '<i class="bi bi-exclamation-triangle me-2"></i>' + (data.error || data.message || "Unknown error");
+                        document.querySelector('.inner-card').insertBefore(errorMsg, document.querySelector('form'));
+                        
+                        setTimeout(() => errorMsg.remove(), 3000);
+                        
                         resendButton.disabled = false;
                         resendText.textContent = 'Resend Code';
                     }
                 })
                 .catch(err => {
-                    alert("Request failed. Please try again.");
+                    // Show error message
+                    const errorMsg = document.createElement('div');
+                    errorMsg.className = 'error-message';
+                    errorMsg.innerHTML = '<i class="bi bi-exclamation-triangle me-2"></i>Request failed. Please try again.';
+                    document.querySelector('.inner-card').insertBefore(errorMsg, document.querySelector('form'));
+                    
+                    setTimeout(() => errorMsg.remove(), 3000);
+                    
                     console.error(err);
                     resendButton.disabled = false;
                     resendText.textContent = 'Resend Code';
                 });
             });
 
-            // Add some interactive effects
+            // Enhanced button hover effects
             document.querySelectorAll('.btn').forEach(btn => {
                 btn.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-2px)';
+                    if (!this.disabled) {
+                        this.style.transform = 'translateY(-2px)';
+                    }
                 });
                 
                 btn.addEventListener('mouseleave', function() {
@@ -548,6 +696,15 @@
                         this.style.transform = 'translateY(0)';
                     }
                 });
+            });
+
+            // Input focus effect
+            codeInput.addEventListener('focus', function() {
+                this.style.transform = 'scale(1.02)';
+            });
+
+            codeInput.addEventListener('blur', function() {
+                this.style.transform = 'scale(1)';
             });
         </script>
     </body>
