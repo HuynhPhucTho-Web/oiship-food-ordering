@@ -28,7 +28,9 @@
                 flex-direction: column;
                 font-family: 'Poppins', sans-serif;
                 position: relative;
-                overflow: hidden;
+                overflow-x: hidden;
+                overflow-y: auto;
+                padding: 20px 0;
             }
 
             /* Floating particles animation */
@@ -107,11 +109,12 @@
             }
 
             h1 {
-                margin-top: 40px;
+                margin-top: 20px;
                 color: #fff;
                 text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
                 animation: fadeInDown 1.2s ease-out;
                 font-weight: 600;
+                font-size: 2.5rem;
             }
 
             p {
@@ -119,6 +122,7 @@
                 text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
                 animation: fadeIn 1.4s ease-out;
                 font-weight: 400;
+                margin-bottom: 15px;
             }
 
             p a {
@@ -135,29 +139,35 @@
 
             /* Reset card */
             .reset-card {
-                max-width: 500px;
+                max-width: 450px;
                 width: 100%;
-                border-radius: 25px;
+                border-radius: 20px;
                 background: rgba(255, 255, 255, 0.95);
                 backdrop-filter: blur(10px);
-                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
                 animation: zoomIn 1s ease-out;
-                margin-top: 30px;
+                margin-top: 15px;
                 border: 1px solid rgba(255, 255, 255, 0.2);
             }
 
             .inner-card {
-                border-radius: 20px;
-                padding: 40px;
+                border-radius: 16px;
+                padding: 30px 25px;
             }
 
             /* Form styling */
             .form-floating input {
                 border: 2px solid #FFE4C4;
-                border-radius: 12px;
+                border-radius: 10px;
                 transition: all 0.3s ease;
                 font-weight: 400;
                 background: rgba(255, 255, 255, 0.9);
+                padding: 12px 16px;
+                font-size: 1rem;
+            }
+
+            .form-floating {
+                margin-bottom: 20px;
             }
 
             .form-floating input:focus {
@@ -246,11 +256,12 @@
             .email-display {
                 background: linear-gradient(135deg, #FFF8E1, #FFECB3);
                 border: 2px solid #FFD180;
-                border-radius: 12px;
-                padding: 15px;
+                border-radius: 10px;
+                padding: 12px;
                 text-align: center;
-                margin-bottom: 20px;
+                margin-bottom: 15px;
                 animation: fadeIn 1s ease-out;
+                font-size: 0.9rem;
             }
 
             .email-display strong {
@@ -320,6 +331,10 @@
                 .inner-card {
                     padding: 20px 15px;
                 }
+                
+                .form-floating {
+                    margin-bottom: 15px;
+                }
             }
         </style>
     </head>
@@ -348,7 +363,7 @@
                 <!-- Hiển thị email -->
                 <div class="email-display">
                     <i class="bi bi-envelope-check me-2"></i>
-                    Reset Password for: <strong>${requestScope.email}</strong>
+                    Reset password for: <strong>${requestScope.email}</strong>
                 </div>
 
                 <!-- Hiển thị lỗi -->
