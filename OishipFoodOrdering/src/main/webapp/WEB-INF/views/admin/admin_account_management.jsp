@@ -217,7 +217,7 @@
                                                     </button>
                                                     <ul class="dropdown-menu">
                                                         <li>
-                                                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-${account.accountID}">Details</a>
+                                                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#detailsModal-${account.accountID}">Detail</a>
                                                         </li>
                                                         <li>
                                                             <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editModal-${account.accountID}">Edit</a>

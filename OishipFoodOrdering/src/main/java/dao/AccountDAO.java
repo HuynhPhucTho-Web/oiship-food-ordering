@@ -356,7 +356,11 @@ public class AccountDAO extends DBContext {
     // Search accounts by role and search term
     public List<Account> searchAccounts(String role, String searchTerm) {
         List<Account> accounts = new ArrayList<>();
-        String sql = "SELECT * FROM Account WHERE role = ? AND (fullName LIKE ? OR email LIKE ?) ORDER BY accountID";
+        String sql = "SELECT a.*, c.phone, c.address "
+                + "FROM Account a "
+                + "LEFT JOIN Customer c ON a.accountID = c.customerID "
+                + "WHERE a.role = ? AND (a.fullName LIKE ? OR a.email LIKE ?) "
+                + "ORDER BY a.accountID";
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, role);
             stmt.setString(2, "%" + searchTerm + "%");
@@ -590,10 +594,10 @@ public class AccountDAO extends DBContext {
         account.setRole(rs.getString("role"));
         account.setCreateAt(rs.getTimestamp("createAt"));
 
-        // Populate Customer object if role is 'customer'
+// Populate Customer object if role is 'customer'
         if ("customer".equals(account.getRole())) {
             Customer customer = new Customer();
-            customer.setCustomerID(rs.getInt("customerID"));
+            customer.setCustomerID(rs.getInt("accountID")); // Use accountID since it matches customerID
             customer.setPhone(rs.getString("phone"));
             customer.setAddress(rs.getString("address"));
             account.setCustomer(customer);
@@ -764,7 +768,6 @@ public class AccountDAO extends DBContext {
         account.setCreateAt(rs.getTimestamp("createAt"));
         return account;
     }
-
 
     private model.Customer getCustomerById(int id) {
         // Giả định có phương thức riêng để lấy Customer
@@ -966,130 +969,130 @@ public class AccountDAO extends DBContext {
     }
 
     public boolean deleteStaffById(int staffId) {
-    if (staffId <= 0) {
-        return false;
+        if (staffId <= 0) {
+            return false;
+        }
+
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            conn.setAutoCommit(false); // Bắt đầu transaction
+
+            // 1. Xóa Review liên quan đến Order sử dụng Voucher do staff tạo
+            String reviewSql = "DELETE FROM Review WHERE FK_Review_OrderDetail IN "
+                    + "(SELECT ODID FROM OrderDetail WHERE FK_OD_Order IN "
+                    + "(SELECT orderID FROM [Order] WHERE FK_Order_Voucher IN "
+                    + "(SELECT voucherID FROM Voucher WHERE FK_Voucher_Account = ?)))";
+            try (PreparedStatement ps = conn.prepareStatement(reviewSql)) {
+                ps.setInt(1, staffId);
+                ps.executeUpdate();
+            }
+
+            // 2. Xóa OrderDetail liên quan đến Order sử dụng Voucher do staff tạo
+            String orderDetailSql = "DELETE FROM OrderDetail WHERE FK_OD_Order IN "
+                    + "(SELECT orderID FROM [Order] WHERE FK_Order_Voucher IN "
+                    + "(SELECT voucherID FROM Voucher WHERE FK_Voucher_Account = ?))";
+            try (PreparedStatement ps = conn.prepareStatement(orderDetailSql)) {
+                ps.setInt(1, staffId);
+                ps.executeUpdate();
+            }
+
+            // 3. Xóa Payment liên quan đến Order sử dụng Voucher do staff tạo
+            String paymentOrderSql = "DELETE FROM Payment WHERE OrderID IN "
+                    + "(SELECT orderID FROM [Order] WHERE FK_Order_Voucher IN "
+                    + "(SELECT voucherID FROM Voucher WHERE FK_Voucher_Account = ?))";
+            try (PreparedStatement ps = conn.prepareStatement(paymentOrderSql)) {
+                ps.setInt(1, staffId);
+                ps.executeUpdate();
+            }
+
+            // 4. Xóa Order sử dụng Voucher do staff tạo
+            String orderSql = "DELETE FROM [Order] WHERE FK_Order_Voucher IN "
+                    + "(SELECT voucherID FROM Voucher WHERE FK_Voucher_Account = ?)";
+            try (PreparedStatement ps = conn.prepareStatement(orderSql)) {
+                ps.setInt(1, staffId);
+                ps.executeUpdate();
+            }
+
+            // 5. Xóa CustomerVoucher liên quan đến Voucher do staff tạo
+            String customerVoucherSql = "DELETE FROM CustomerVoucher WHERE voucherID IN "
+                    + "(SELECT voucherID FROM Voucher WHERE FK_Voucher_Account = ?)";
+            try (PreparedStatement ps = conn.prepareStatement(customerVoucherSql)) {
+                ps.setInt(1, staffId);
+                ps.executeUpdate();
+            }
+
+            // 6. Xóa CustomerNotification liên quan đến Notification do staff tạo
+            String customerNotificationSql = "DELETE FROM CustomerNotification WHERE notID IN "
+                    + "(SELECT notID FROM Notification WHERE FK_Notification_Account = ?)";
+            try (PreparedStatement ps = conn.prepareStatement(customerNotificationSql)) {
+                ps.setInt(1, staffId);
+                ps.executeUpdate();
+            }
+
+            // 7. Xóa Payment liên quan đến AccountID
+            String paymentAccountSql = "DELETE FROM Payment WHERE AccountID = ?";
+            try (PreparedStatement ps = conn.prepareStatement(paymentAccountSql)) {
+                ps.setInt(1, staffId);
+                ps.executeUpdate();
+            }
+
+            // 8. Xóa Ingredient do staff quản lý
+            String ingredientSql = "DELETE FROM Ingredient WHERE FK_Ingredient_Account = ?";
+            try (PreparedStatement ps = conn.prepareStatement(ingredientSql)) {
+                ps.setInt(1, staffId);
+                ps.executeUpdate();
+            }
+
+            // 9. Xóa Voucher do staff tạo
+            String voucherSql = "DELETE FROM Voucher WHERE FK_Voucher_Account = ?";
+            try (PreparedStatement ps = conn.prepareStatement(voucherSql)) {
+                ps.setInt(1, staffId);
+                ps.executeUpdate();
+            }
+
+            // 10. Xóa Notification do staff tạo
+            String notiSql = "DELETE FROM Notification WHERE FK_Notification_Account = ?";
+            try (PreparedStatement ps = conn.prepareStatement(notiSql)) {
+                ps.setInt(1, staffId);
+                ps.executeUpdate();
+            }
+
+            // 11. Xóa Account
+            String accountSql = "DELETE FROM Account WHERE accountID = ? AND role = 'staff'";
+            try (PreparedStatement ps = conn.prepareStatement(accountSql)) {
+                ps.setInt(1, staffId);
+                int affectedRows = ps.executeUpdate();
+                if (affectedRows > 0) {
+                    conn.commit();
+                    return true;
+                } else {
+                    throw new SQLException("No Account found with staffId = " + staffId + " and role = 'staff'");
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("SQL Error in deleteStaffById: " + e.getMessage());
+            e.printStackTrace();
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            return false;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
-
-    Connection conn = null;
-    try {
-        conn = getConnection();
-        conn.setAutoCommit(false); // Bắt đầu transaction
-
-        // 1. Xóa Review liên quan đến Order sử dụng Voucher do staff tạo
-        String reviewSql = "DELETE FROM Review WHERE FK_Review_OrderDetail IN "
-                + "(SELECT ODID FROM OrderDetail WHERE FK_OD_Order IN "
-                + "(SELECT orderID FROM [Order] WHERE FK_Order_Voucher IN "
-                + "(SELECT voucherID FROM Voucher WHERE FK_Voucher_Account = ?)))";
-        try (PreparedStatement ps = conn.prepareStatement(reviewSql)) {
-            ps.setInt(1, staffId);
-            ps.executeUpdate();
-        }
-
-        // 2. Xóa OrderDetail liên quan đến Order sử dụng Voucher do staff tạo
-        String orderDetailSql = "DELETE FROM OrderDetail WHERE FK_OD_Order IN "
-                + "(SELECT orderID FROM [Order] WHERE FK_Order_Voucher IN "
-                + "(SELECT voucherID FROM Voucher WHERE FK_Voucher_Account = ?))";
-        try (PreparedStatement ps = conn.prepareStatement(orderDetailSql)) {
-            ps.setInt(1, staffId);
-            ps.executeUpdate();
-        }
-
-        // 3. Xóa Payment liên quan đến Order sử dụng Voucher do staff tạo
-        String paymentOrderSql = "DELETE FROM Payment WHERE OrderID IN "
-                + "(SELECT orderID FROM [Order] WHERE FK_Order_Voucher IN "
-                + "(SELECT voucherID FROM Voucher WHERE FK_Voucher_Account = ?))";
-        try (PreparedStatement ps = conn.prepareStatement(paymentOrderSql)) {
-            ps.setInt(1, staffId);
-            ps.executeUpdate();
-        }
-
-        // 4. Xóa Order sử dụng Voucher do staff tạo
-        String orderSql = "DELETE FROM [Order] WHERE FK_Order_Voucher IN "
-                + "(SELECT voucherID FROM Voucher WHERE FK_Voucher_Account = ?)";
-        try (PreparedStatement ps = conn.prepareStatement(orderSql)) {
-            ps.setInt(1, staffId);
-            ps.executeUpdate();
-        }
-
-        // 5. Xóa CustomerVoucher liên quan đến Voucher do staff tạo
-        String customerVoucherSql = "DELETE FROM CustomerVoucher WHERE voucherID IN "
-                + "(SELECT voucherID FROM Voucher WHERE FK_Voucher_Account = ?)";
-        try (PreparedStatement ps = conn.prepareStatement(customerVoucherSql)) {
-            ps.setInt(1, staffId);
-            ps.executeUpdate();
-        }
-
-        // 6. Xóa CustomerNotification liên quan đến Notification do staff tạo
-        String customerNotificationSql = "DELETE FROM CustomerNotification WHERE notID IN "
-                + "(SELECT notID FROM Notification WHERE FK_Notification_Account = ?)";
-        try (PreparedStatement ps = conn.prepareStatement(customerNotificationSql)) {
-            ps.setInt(1, staffId);
-            ps.executeUpdate();
-        }
-
-        // 7. Xóa Payment liên quan đến AccountID
-        String paymentAccountSql = "DELETE FROM Payment WHERE AccountID = ?";
-        try (PreparedStatement ps = conn.prepareStatement(paymentAccountSql)) {
-            ps.setInt(1, staffId);
-            ps.executeUpdate();
-        }
-
-        // 8. Xóa Ingredient do staff quản lý
-        String ingredientSql = "DELETE FROM Ingredient WHERE FK_Ingredient_Account = ?";
-        try (PreparedStatement ps = conn.prepareStatement(ingredientSql)) {
-            ps.setInt(1, staffId);
-            ps.executeUpdate();
-        }
-
-        // 9. Xóa Voucher do staff tạo
-        String voucherSql = "DELETE FROM Voucher WHERE FK_Voucher_Account = ?";
-        try (PreparedStatement ps = conn.prepareStatement(voucherSql)) {
-            ps.setInt(1, staffId);
-            ps.executeUpdate();
-        }
-
-        // 10. Xóa Notification do staff tạo
-        String notiSql = "DELETE FROM Notification WHERE FK_Notification_Account = ?";
-        try (PreparedStatement ps = conn.prepareStatement(notiSql)) {
-            ps.setInt(1, staffId);
-            ps.executeUpdate();
-        }
-
-        // 11. Xóa Account
-        String accountSql = "DELETE FROM Account WHERE accountID = ? AND role = 'staff'";
-        try (PreparedStatement ps = conn.prepareStatement(accountSql)) {
-            ps.setInt(1, staffId);
-            int affectedRows = ps.executeUpdate();
-            if (affectedRows > 0) {
-                conn.commit();
-                return true;
-            } else {
-                throw new SQLException("No Account found with staffId = " + staffId + " and role = 'staff'");
-            }
-        }
-
-    } catch (SQLException e) {
-        System.err.println("SQL Error in deleteStaffById: " + e.getMessage());
-        e.printStackTrace();
-        if (conn != null) {
-            try {
-                conn.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }
-        return false;
-    } finally {
-        if (conn != null) {
-            try {
-                conn.setAutoCommit(true);
-                conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-}
 
     public Account getAccountByEmail(String email) {
         Account account = null;
