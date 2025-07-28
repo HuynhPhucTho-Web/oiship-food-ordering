@@ -365,13 +365,13 @@
         </div>
 
         <!-- Background logo text -->
-        <div class="bg-logo-text">OISHOP FOOD</div>
+        <div class="bg-logo-text">OISHIP FOOD</div>
 
         <a href="/OishipFoodOrdering">
             <img src="images/logov2.png" alt="Oishop Logo" class="logo" />
         </a>
 
-        <h1 class="display-4 fw-bold">Welcome to Oishop Food!</h1>
+        <h1 class="display-4 fw-bold">Welcome to Oiship Food!</h1>
         <p class="mt-3 fs-5">Don't have an account? <a href="register">Create one now</a></p>
 
         <div class="login-card">
