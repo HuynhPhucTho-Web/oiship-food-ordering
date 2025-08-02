@@ -1120,4 +1120,66 @@ public class AccountDAO extends DBContext {
         return account;
     }
 
+    public Account findByID(int accountID) {
+        if (accountID <= 0) {
+            System.out.println("findByID: Invalid accountID: " + accountID + " at " + new java.util.Date());
+            return null;
+        }
+
+        String sql = "SELECT a.accountID, a.fullName, a.email, a.[password], a.status, a.role, a.createAt, "
+                + "c.phone, c.address "
+                + "FROM Account a LEFT JOIN Customer c ON a.accountID = c.customerID "
+                + "WHERE a.accountID = ?";
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, accountID);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Account account = new Account();
+                    account.setAccountID(rs.getInt("accountID"));
+                    account.setFullName(rs.getString("fullName"));
+                    account.setEmail(rs.getString("email"));
+                    account.setPassword(rs.getString("password"));
+                    account.setStatus(rs.getInt("status"));
+                    account.setRole(rs.getString("role"));
+                    account.setCreateAt(rs.getTimestamp("createAt"));
+
+                    // Log successful retrieval
+                    System.out.println("findByID: Successfully found account for ID " + accountID
+                            + " - Name: " + account.getFullName()
+                            + " - Role: " + account.getRole()
+                            + " - Email: " + account.getEmail()
+                            + " at " + new java.util.Date());
+
+                    // Populate Customer object if role is "customer" and data exists
+                    if ("customer".equals(account.getRole())) {
+                        Customer customer = new Customer();
+                        customer.setCustomerID(account.getAccountID());
+                        customer.setPhone(rs.getString("phone") != null ? rs.getString("phone") : "");
+                        customer.setAddress(rs.getString("address") != null ? rs.getString("address") : "");
+                        account.setCustomer(customer);
+
+                        System.out.println("findByID: Added customer details - Phone: " + customer.getPhone()
+                                + " - Address: " + customer.getAddress());
+                    }
+
+                    return account;
+                } else {
+                    System.out.println("findByID: No account found for ID: " + accountID + " at " + new java.util.Date());
+                    return null;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("findByID: SQL Error retrieving account by ID " + accountID + " at " + new java.util.Date() + ": " + e.getMessage());
+            e.printStackTrace();
+            Util.logError("findByID: SQL Error for accountID " + accountID + ": " + e.getMessage());
+            return null;
+        } catch (Exception e) {
+            System.err.println("findByID: Unexpected error retrieving account by ID " + accountID + " at " + new java.util.Date() + ": " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
