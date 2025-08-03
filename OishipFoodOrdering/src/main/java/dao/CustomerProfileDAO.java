@@ -4,6 +4,7 @@
  */
 package dao;
 
+import com.google.common.util.concurrent.Service;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,9 +26,9 @@ public class CustomerProfileDAO extends DBContext {
         super();
     }
 
-    public Customer getCustomerByEmail(String email) {
+      public Customer getCustomerByEmail(String email) {
         LOGGER.info("Attempting to retrieve customer with email: " + email);
-
+        
         if (email == null || email.trim().isEmpty()) {
             LOGGER.warning("Invalid email: " + email);
             return null;
@@ -38,11 +39,12 @@ public class CustomerProfileDAO extends DBContext {
                 + "FROM Account a JOIN Customer c ON a.accountID = c.customerID "
                 + "WHERE a.email = ? AND a.role = 'customer'";
 
-        try (
+        // Use try-with-resources to ensure proper connection management
+       try (
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+            
             stmt.setString(1, email);
-
+            
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     Customer customer = new Customer(
@@ -62,13 +64,59 @@ public class CustomerProfileDAO extends DBContext {
                     LOGGER.warning("No customer found for email: " + email);
                 }
             }
-
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error retrieving customer by email: " + e.getMessage(), e);
+            
+            // Try to reconnect and retry once
         }
-
         return null;
     }
+
+    
+//    public Customer getCustomerByEmail(String email) {
+//        LOGGER.info("Attempting to retrieve customer with email: " + email);
+//
+//        if (email == null || email.trim().isEmpty()) {
+//            LOGGER.warning("Invalid email: " + email);
+//            return null;
+//        }
+//
+//        String sql = "SELECT a.accountID AS customerID, a.fullName, a.email, a.[password], "
+//                + "a.role, a.createAt, a.status, c.phone, c.address "
+//                + "FROM Account a JOIN Customer c ON a.accountID = c.customerID "
+//                + "WHERE a.email = ? AND a.role = 'customer'";
+//
+//        try (
+//                PreparedStatement stmt = conn.prepareStatement(sql)) {
+//
+//            stmt.setString(1, email);
+//
+//            try (ResultSet rs = stmt.executeQuery()) {
+//                if (rs.next()) {
+//                    Customer customer = new Customer(
+//                            rs.getInt("customerID"),
+//                            rs.getString("fullName"),
+//                            rs.getString("email"),
+//                            rs.getString("password"),
+//                            rs.getString("role"),
+//                            rs.getTimestamp("createAt"),
+//                            rs.getInt("status"),
+//                            rs.getString("phone"),
+//                            rs.getString("address")
+//                    );
+//                    LOGGER.info("Customer found: " + customer.getFullName());
+//                    return customer;
+//                } else {
+//                    LOGGER.warning("No customer found for email: " + email);
+//                }
+//            }
+//
+//        } catch (SQLException e) {
+//            LOGGER.log(Level.SEVERE, "Error retrieving customer by email: " + e.getMessage(), e);
+//        }
+//
+//        return null;
+//    }
 
    public boolean editCustomerInfoByEmail(String email, String newName, String newPhone, String newAddress) {
     if (email == null || email.trim().isEmpty() ||
