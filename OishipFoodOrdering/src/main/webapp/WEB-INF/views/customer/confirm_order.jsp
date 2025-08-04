@@ -850,7 +850,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="modalPhone" class="form-label">
+                            <label for="modalPhone" class="form-label" max="10 ">
                                 <i class="fas fa-phone me-2"></i>
                                 Phone Number
                             </label>
