@@ -407,9 +407,9 @@
                     </div>
                     
                     <div class="col-12 col-lg-5">
-                        <a href="google-init?role=customer" class="btn btn-social w-100 d-flex align-items-center justify-content-center mb-3">
+<!--                        <a href="google-init?role=customer" class="btn btn-social w-100 d-flex align-items-center justify-content-center mb-3">
                             <i class="bi bi-google me-2"></i>Continue with Google
-                        </a>
+                        </a>-->
                         <a href="/OishipFoodOrdering" class="btn btn-back w-100 d-flex align-items-center justify-content-center">
                             <i class="bi bi-house-door-fill me-2"></i>Back to Home
                         </a>
